@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Inquérito sobre propriedade coletiva e individual nas cooperativas de habitação.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Cooperativas de Habitação</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/instrument-serif-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/instrument-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="survey.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <img src="icon.svg" width="29" height="29" alt="">
+      <span>Cooperativas de Habitação</span>
+    </div>
+  </header>
+
+  <main class="survey">
+    <h1 aria-label="Quantas cooperativas construíram em propriedade coletiva?">Quantas cooperativas<br class="desktop-break"> construíram em<br class="desktop-break"> <em>propriedade coletiva?</em></h1>
+
+    <div id="intro" class="intro">
+      <button id="respond" class="button" type="button" aria-controls="response-panel" hidden disabled>Responder</button>
+      <noscript><p>Ativa o JavaScript para responder ao inquérito.</p></noscript>
+    </div>
+
+    <section id="response-panel" class="panel" aria-labelledby="response-heading" hidden>
+      <h2 id="response-heading">A tua resposta</h2>
+      <form id="response-form" method="post" action="api/responses">
+        <fieldset id="response-fields" class="fields">
+          <div class="field">
+            <label for="cooperative">Nome da cooperativa</label>
+            <input id="cooperative" name="cooperative" autocomplete="organization" maxlength="120" required>
+          </div>
+          <div class="field">
+            <label for="email">Email de contacto</label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required aria-describedby="privacy">
+            <p id="privacy" class="hint">O email é reservado ao contacto e fica privado.</p>
+          </div>
+          <fieldset class="options" aria-describedby="options-hint">
+            <legend>Como construíram?</legend>
+            <p id="options-hint" class="hint">Podes selecionar as duas opções.</p>
+            <label class="option">
+              <input type="checkbox" name="collective">
+              <span>Construímos em propriedade coletiva</span>
+            </label>
+            <label class="option">
+              <input type="checkbox" name="individual">
+              <span>Construímos em propriedade individual</span>
+            </label>
+          </fieldset>
+          <button id="submit-response" class="button" type="submit">Enviar resposta</button>
+        </fieldset>
+        <p id="form-error" class="feedback" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section id="results-panel" class="panel" aria-labelledby="results-heading" hidden>
+      <h2 id="results-heading" tabindex="-1">Resultados</h2>
+      <p class="results-status">A tua resposta foi registada.</p>
+      <div class="chart" role="group" aria-label="Respostas por tipo de propriedade">
+        <div class="chart-row">
+          <div class="chart-caption">
+            <span>Propriedade coletiva</span>
+            <strong id="collective-count"></strong>
+          </div>
+          <div class="track" aria-hidden="true"><div id="collective-bar" class="bar bar-collective"></div></div>
+        </div>
+        <div class="chart-row">
+          <div class="chart-caption">
+            <span>Propriedade individual</span>
+            <strong id="individual-count"></strong>
+          </div>
+          <div class="track" aria-hidden="true"><div id="individual-bar" class="bar bar-individual"></div></div>
+        </div>
+      </div>
+      <p id="results-summary" class="summary" role="status"></p>
+      <p class="hint">Cada resposta pode contar nas duas categorias.</p>
+      <p id="results-error" class="feedback" role="status" hidden>De momento, o gráfico mostra a última contagem disponível.</p>
+    </section>
+  </main>
+</body>
+</html>

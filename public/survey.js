@@ -1,0 +1,150 @@
+const respond = document.querySelector("#respond");
+const intro = document.querySelector("#intro");
+const formPanel = document.querySelector("#response-panel");
+const form = document.querySelector("#response-form");
+const fields = document.querySelector("#response-fields");
+const submitButton = document.querySelector("#submit-response");
+const formError = document.querySelector("#form-error");
+const results = document.querySelector("#results-panel");
+const resultsError = document.querySelector("#results-error");
+const summary = document.querySelector("#results-summary");
+const groups = ["collective", "individual"].map((name) => ({
+  name,
+  count: document.querySelector(`#${name}-count`),
+  bar: document.querySelector(`#${name}-bar`),
+}));
+
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const number = new Intl.NumberFormat("pt-PT");
+let responseId;
+let refreshing = false;
+
+async function reveal(current, next, focus) {
+  if (!reducedMotion.matches && current.animate) {
+    await current.animate(
+      [{ opacity: 1 }, { opacity: 0, transform: "translateY(-.25rem)" }],
+      { duration: 160, easing: "ease-in", fill: "forwards" },
+    ).finished;
+  }
+
+  current.hidden = true;
+  next.hidden = false;
+
+  if (!reducedMotion.matches && next.animate) {
+    next.animate(
+      [{ opacity: 0, transform: "translateY(.45rem)" }, { opacity: 1 }],
+      { duration: 300, easing: "ease-out" },
+    );
+  }
+
+  focus.focus({ preventScroll: true });
+  const { top, bottom } = focus.getBoundingClientRect();
+  if (top < 0 || bottom > window.innerHeight) {
+    focus.scrollIntoView({ block: "center", behavior: reducedMotion.matches ? "instant" : "smooth" });
+  }
+}
+
+function showFormError(message) {
+  formError.textContent = message;
+  formError.hidden = !message;
+}
+
+function showTotals(totals) {
+  for (const { name, count, bar } of groups) {
+    count.textContent = number.format(totals[name]);
+    const percent = totals.responses ? (100 * totals[name]) / totals.responses : 0;
+    bar.style.width = `${percent}%`;
+  }
+
+  const end = totals.responses === 1 ? "resposta registada" : "respostas registadas";
+  const text = `${number.format(totals.responses)} ${end}`;
+  if (summary.textContent !== text) summary.textContent = text;
+  resultsError.hidden = true;
+}
+
+async function fetchTotals() {
+  if (document.hidden || refreshing) return;
+  refreshing = true;
+  try {
+    const response = await fetch("api/results", { signal: AbortSignal.timeout(12000) });
+    if (!response.ok) throw new Error();
+    showTotals(await response.json());
+  } catch {
+    resultsError.hidden = false;
+  } finally {
+    refreshing = false;
+  }
+}
+
+respond.addEventListener("click", () => {
+  respond.disabled = true;
+  reveal(intro, formPanel, form.elements.cooperative);
+});
+
+form.addEventListener("input", () => {
+  responseId = undefined;
+  showFormError("");
+});
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (fields.disabled) return;
+
+  const data = new FormData(form);
+  const collective = data.has("collective");
+  const individual = data.has("individual");
+  if (!collective && !individual) {
+    showFormError("Seleciona pelo menos uma opção.");
+    form.elements.collective.focus();
+    return;
+  }
+
+  const cooperative = data.get("cooperative").trim();
+  if (!cooperative) {
+    showFormError("Indica o nome da cooperativa.");
+    form.elements.cooperative.focus();
+    return;
+  }
+
+  showFormError("");
+  fields.disabled = true;
+  submitButton.textContent = "A enviar…";
+
+  try {
+    responseId ??= crypto.randomUUID();
+    const response = await fetch("api/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(12000),
+      body: JSON.stringify({
+        id: responseId,
+        cooperative,
+        email: data.get("email").trim(),
+        collective,
+        individual,
+      }),
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      showFormError(payload.error);
+      return;
+    }
+
+    await reveal(formPanel, results, document.querySelector("#results-heading"));
+    showTotals(payload);
+    form.reset();
+    window.setInterval(fetchTotals, 15000);
+    document.addEventListener("visibilitychange", fetchTotals);
+  } catch {
+    showFormError("O envio não pôde ser confirmado. Tenta novamente.");
+  } finally {
+    if (results.hidden) {
+      fields.disabled = false;
+      submitButton.textContent = "Enviar resposta";
+    }
+  }
+});
+
+intro.classList.add("is-ready");
+respond.hidden = false;
+respond.disabled = false;
