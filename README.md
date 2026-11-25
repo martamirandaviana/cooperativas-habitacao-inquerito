@@ -1,6 +1,6 @@
 # Cooperativas de Habitação
 
-Inquérito em português sobre construção em propriedade coletiva e individual. O site usa HTML, CSS e JavaScript. Cloudflare Workers serve o site e a API no mesmo endereço, e Cloudflare D1 guarda as respostas. O código pode ficar num repositório privado no GitHub Free.
+Inquérito em português sobre construção em propriedade coletiva e individual. O site usa HTML, CSS e JavaScript. Um Worker serve o site e a API no mesmo endereço, e D1 guarda as respostas. O código fica num repositório privado no GitHub Free.
 
 Cada envio conta uma vez em cada opção selecionada. A contagem corresponde aos envios registados. Uma cooperativa pode aparecer em ambas as barras e pode realizar mais do que um envio. Repetir o mesmo pedido após uma falha de rede não duplica a resposta.
 
@@ -16,7 +16,11 @@ npm run dev
 
 Abre o endereço que o Wrangler mostrar no terminal.
 
-## Configurar e publicar após aprovação
+## Publicação gerida pelo Codex Sites
+
+O comando `npm run build:sites` empacota o mesmo formulário e a mesma API num Worker. O manifesto `.openai/hosting.json` associa a publicação ao projeto Sites e à base de produção `DB`. As migrações da base estão no diretório `drizzle/`. O Codex Sites gere a base de dados e o alojamento do site.
+
+## Publicação alternativa numa conta Cloudflare
 
 1. Entra numa conta [Cloudflare](https://dash.cloudflare.com/) com o plano Workers Free. Na secção **Workers & Pages**, ativa o subdomínio gratuito `workers.dev` se a conta ainda não o tiver.
 2. No diretório do projeto, executa:
@@ -39,4 +43,4 @@ Abre o endereço que o Wrangler mostrar no terminal.
 
 ## Acesso aos dados
 
-O Worker guarda o nome, o email e as opções na tabela D1. A API devolve exclusivamente três números: total de respostas, total com propriedade coletiva e total com propriedade individual. Os contactos podem ser consultados por pessoas com acesso à base na conta Cloudflare, em **Storage & databases → D1**. Mantém a base e as credenciais sob acesso restrito. O diretório público contém apenas o site e os seus recursos.
+O Worker guarda o nome, o email e as opções na tabela D1. A API devolve exclusivamente três números: total de respostas, total com propriedade coletiva e total com propriedade individual. A consulta de contactos requer acesso de gestão à base de dados. O diretório público contém apenas o site e os seus recursos.

@@ -7,9 +7,11 @@
     "dev": "node scripts/dev.js",
     "db:local": "wrangler d1 migrations apply DB --local",
     "db:remote": "wrangler d1 migrations apply DB --remote",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "build:sites": "node scripts/build-sites.js"
   },
   "devDependencies": {
+    "esbuild": "0.28.2",
     "wrangler": "4.168.0"
   }
 }

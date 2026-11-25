@@ -14,6 +14,7 @@
     {
       "binding": "DB",
       "database_name": "cooperativas-habitacao",
+      "migrations_dir": "drizzle",
       // Substituir pelo ID devolvido pelo comando d1 create antes de publicar.
       "database_id": "00000000-0000-0000-0000-000000000000"
     }
