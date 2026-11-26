@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Inquérito sobre propriedade coletiva e individual nas cooperativas de habitação.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Cooperativas de Habitação</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="survey.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <p>Inquérito realizado no âmbito da Bolsa de Investigação de Doutoramento da FCT sobre Cooperativas de Habitação Acessível</p>
+    </div>
+  </header>
+
+  <main class="survey">
+    <h1 aria-label="Quantas cooperativas construíram em propriedade coletiva?">Quantas cooperativas<br class="desktop-break"> construíram em<br class="desktop-break"> <span class="question-mark"><a class="question-link" href="./" aria-label="Propriedade coletiva, voltar à página inicial"><strong>propriedade coletiva</strong></a><b>?</b></span></h1>
+
+    <div id="intro" class="intro">
+      <button id="respond" class="button" type="button" aria-controls="response-panel" hidden disabled>Responder</button>
+      <noscript><p>Ativa o JavaScript para responder ao inquérito.</p></noscript>
+    </div>
+
+    <section id="response-panel" class="panel" aria-labelledby="response-heading" hidden>
+      <h2 id="response-heading">A tua resposta</h2>
+      <form id="response-form" method="post">
+        <fieldset id="response-fields" class="fields">
+          <div class="field">
+            <label for="cooperative">Nome da cooperativa</label>
+            <input id="cooperative" name="cooperative" autocomplete="organization" maxlength="120" required>
+          </div>
+          <div class="field">
+            <label for="email">Email de contacto</label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required>
+          </div>
+          <fieldset class="options">
+            <legend>Regime de propriedade</legend>
+            <label class="option">
+              <input type="radio" name="property" value="collective" required>
+              <span>Construímos ou estamos a construir em <strong>propriedade coletiva</strong></span>
+            </label>
+            <label class="option">
+              <input type="radio" name="property" value="individual">
+              <span>Construímos ou estamos a construir em <strong>propriedade individual</strong></span>
+            </label>
+            <label class="option">
+              <input type="radio" name="property" value="both">
+              <span>Construímos ou estamos a construir em <strong>propriedade coletiva e individual</strong></span>
+            </label>
+          </fieldset>
+          <button id="submit-response" class="button" type="submit">Enviar resposta</button>
+        </fieldset>
+        <p id="form-error" class="feedback" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section id="results-panel" class="panel" aria-labelledby="results-heading" hidden>
+      <h2 id="results-heading" tabindex="-1">Resultados</h2>
+      <p class="results-status">A tua resposta foi registada.</p>
+      <div class="chart" role="group" aria-label="Respostas por tipo de propriedade">
+        <div class="chart-series" role="group" aria-labelledby="collective-label">
+          <div class="chart-column">
+            <div id="collective-bar" class="bar bar-collective">
+              <strong id="collective-count" class="chart-count"></strong>
+            </div>
+          </div>
+          <strong id="collective-label" class="chart-caption collective-emphasis">Propriedade coletiva</strong>
+        </div>
+        <div class="chart-series" role="group" aria-labelledby="individual-label">
+          <div class="chart-column">
+            <div id="individual-bar" class="bar bar-individual">
+              <strong id="individual-count" class="chart-count"></strong>
+            </div>
+          </div>
+          <strong id="individual-label" class="chart-caption">Propriedade individual</strong>
+        </div>
+      </div>
+      <p id="results-summary" class="summary" role="status"></p>
+      <p class="hint">Cada resposta pode contar nas duas categorias.</p>
+      <p id="results-error" class="feedback" role="status" hidden>De momento, o gráfico mostra a última contagem disponível.</p>
+    </section>
+  </main>
+</body>
+</html>

@@ -28,6 +28,10 @@ Abre o endereço que o Wrangler mostrar no terminal.
 
 O comando `npm run build:sites` empacota o mesmo formulário e a mesma API num Worker. O manifesto `.openai/hosting.json` associa a publicação ao projeto Sites e à base de produção `DB`. As migrações da base estão no diretório `drizzle/`. O Codex Sites gere a base de dados e o alojamento do site.
 
+## Migração para GitHub Pages
+
+A pasta `docs/` contém a página com o mesmo formulário e gráfico, preparada para servir pelo GitHub Pages. As respostas são guardadas numa folha privada do Google Sheets. Segue o [guia para configurar a folha e testar a publicação](google/PREPARAR.md).
+
 ## Publicação alternativa numa conta Cloudflare
 
 1. Entra numa conta [Cloudflare](https://dash.cloudflare.com/) com o plano Workers Free. Na secção **Workers & Pages**, ativa o subdomínio gratuito `workers.dev` se a conta ainda não o tiver.
