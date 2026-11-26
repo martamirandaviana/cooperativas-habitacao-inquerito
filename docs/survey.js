@@ -45,7 +45,7 @@ const groups = ["collective", "individual"].map((name) => ({
 
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 const number = new Intl.NumberFormat("pt-PT");
-const refreshInterval = 5000;
+const refreshInterval = 3000;
 let responseId;
 let refreshing = false;
 
@@ -113,8 +113,11 @@ async function fetchTotals() {
 async function requestSurvey(submission) {
   if (!surveyEndpoint) throw new Error("Inquérito por configurar.");
 
+  const url = new URL(surveyEndpoint);
+  if (!submission) url.searchParams.set("refresh", Date.now());
+
   // A plain-text POST allows browsers to call the Apps Script web app without a preflight.
-  const response = await fetch(surveyEndpoint, {
+  const response = await fetch(url, {
     credentials: "omit",
     cache: "no-store",
     signal: AbortSignal.timeout(20000),
@@ -199,6 +202,7 @@ form.addEventListener("submit", async (event) => {
     form.reset();
     window.setInterval(fetchTotals, refreshInterval);
     document.addEventListener("visibilitychange", fetchTotals);
+    window.addEventListener("focus", fetchTotals);
   } catch {
     showFormError("O envio não pôde ser confirmado. Tenta novamente.");
   } finally {
