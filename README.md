@@ -1,5 +1,7 @@
 # Cooperativas de Habitação
 
+[Abrir o inquérito](https://inquerito.mrt-arch.com/) · [Área privada de administração](https://inquerito.mrt-arch.com/administracao)
+
 Inquérito em português sobre construção em propriedade coletiva e individual. O site usa HTML, CSS e JavaScript. Um Worker serve o site e a API no mesmo endereço, e D1 guarda as respostas. O código fica num repositório privado no GitHub Free.
 
 Cada envio conta uma vez em cada opção selecionada. A contagem corresponde aos envios registados. Uma cooperativa pode aparecer em ambas as barras e pode realizar mais do que um envio. Repetir o mesmo pedido após uma falha de rede não duplica a resposta.
@@ -44,3 +46,5 @@ O comando `npm run build:sites` empacota o mesmo formulário e a mesma API num W
 ## Acesso aos dados
 
 O Worker guarda o nome, o email e as opções na tabela D1. A API devolve exclusivamente três números: total de respostas, total com propriedade coletiva e total com propriedade individual. A consulta de contactos requer acesso de gestão à base de dados. O diretório público contém apenas o site e os seus recursos.
+
+A área `/administracao` permite consultar e apagar respostas. A entrada é feita através do ChatGPT. O Worker usa o endereço da sessão autenticada e compara-o com `ADMIN_EMAIL`, configurado como segredo do Site. Antes de apagar, a área mostra a resposta e pede uma confirmação. Os totais públicos passam a refletir a eliminação assim que são atualizados.

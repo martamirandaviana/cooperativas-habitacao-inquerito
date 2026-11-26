@@ -8,7 +8,7 @@
   "preview_urls": false,
   "assets": {
     "directory": "./public",
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": ["/api/*", "/administracao", "/administracao/*"]
   },
   "d1_databases": [
     {

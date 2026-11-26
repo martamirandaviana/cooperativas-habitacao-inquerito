@@ -1,3 +1,5 @@
+import { administration } from "./admin.js";
+
 const aggregates = `
   SELECT COUNT(*) AS responses,
          COUNT(*) FILTER (WHERE collective = 1) AS collective,
@@ -79,8 +81,13 @@ async function submit(request, db) {
 
 export default {
   async fetch(request, env) {
-    const { pathname } = new URL(request.url);
+    const url = new URL(request.url);
+    const { pathname } = url;
     try {
+      if (pathname === "/administracao" || pathname === "/administracao/") {
+        return await administration(request, env, url);
+      }
+
       if (pathname === "/api/results") {
         if (request.method !== "GET") {
           return json({ error: "Método inválido." }, 405, { Allow: "GET" });
