@@ -16,6 +16,7 @@ const groups = ["collective", "individual"].map((name) => ({
 
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 const number = new Intl.NumberFormat("pt-PT");
+const refreshInterval = 5000;
 let responseId;
 let refreshing = false;
 
@@ -50,10 +51,16 @@ function showFormError(message) {
 }
 
 function showTotals(totals) {
+  const maxCount = Math.max(5, ...groups.map(({ name }) => totals[name]));
+  const magnitude = 10 ** Math.floor(Math.log10(maxCount));
+  const chartMax = [1, 2, 5, 10].map((value) => value * magnitude)
+    .find((value) => value >= maxCount);
+
   for (const { name, count, bar } of groups) {
-    count.textContent = number.format(totals[name]);
-    const percent = totals.responses ? (100 * totals[name]) / totals.responses : 0;
-    bar.style.width = `${percent}%`;
+    const total = totals[name];
+    count.textContent = number.format(total);
+    count.style.opacity = total === 0 ? "0" : "";
+    bar.style.height = `${(100 * total) / chartMax}%`;
   }
 
   const end = totals.responses === 1 ? "resposta registada" : "respostas registadas";
@@ -91,11 +98,12 @@ form.addEventListener("submit", async (event) => {
   if (fields.disabled) return;
 
   const data = new FormData(form);
-  const collective = data.has("collective");
-  const individual = data.has("individual");
+  const property = data.get("property");
+  const collective = property === "collective" || property === "both";
+  const individual = property === "individual" || property === "both";
   if (!collective && !individual) {
-    showFormError("Seleciona pelo menos uma opção.");
-    form.elements.collective.focus();
+    showFormError("Seleciona uma opção.");
+    form.elements.property[0].focus();
     return;
   }
 
@@ -133,7 +141,7 @@ form.addEventListener("submit", async (event) => {
     await reveal(formPanel, results, document.querySelector("#results-heading"));
     showTotals(payload);
     form.reset();
-    window.setInterval(fetchTotals, 15000);
+    window.setInterval(fetchTotals, refreshInterval);
     document.addEventListener("visibilitychange", fetchTotals);
   } catch {
     showFormError("O envio não pôde ser confirmado. Tenta novamente.");
