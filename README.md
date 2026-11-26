@@ -1,6 +1,12 @@
 # Cooperativas de Habitação
 
-[Abrir o inquérito](https://inquerito.mrt-arch.com/) · [Área privada de administração](https://inquerito.mrt-arch.com/administracao)
+## Ligações do projeto
+
+- [Inquérito público](https://inquerito.mrt-arch.com/) — endereço a partilhar com as cooperativas.
+- [Área privada](https://inquerito.mrt-arch.com/administracao) — consultar e apagar respostas na conta ChatGPT autorizada.
+- [Código e histórico no GitHub](https://github.com/martamirandaviana/cooperativas-habitacao-inquerito) — repositório privado, independente do site original.
+
+Podes guardar este README nos favoritos para encontrar as ligações quando precisares. A gestão do alojamento fica na conta proprietária do Codex Sites. Se precisares de mudar quem entra na área privada, atualiza o segredo `ADMIN_EMAIL` no Codex Sites e confirma o acesso com a nova conta antes de deixares de usar a anterior.
 
 Inquérito em português sobre construção em propriedade coletiva e individual. O site usa HTML, CSS e JavaScript. Um Worker serve o site e a API no mesmo endereço, e D1 guarda as respostas. O código fica num repositório privado no GitHub Free.
 
