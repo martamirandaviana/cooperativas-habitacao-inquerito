@@ -36,6 +36,7 @@ const submitButton = document.querySelector("#submit-response");
 const formError = document.querySelector("#form-error");
 const results = document.querySelector("#results-panel");
 const resultsError = document.querySelector("#results-error");
+const chart = results.querySelector(".chart");
 const summary = document.querySelector("#results-summary");
 const groups = ["collective", "individual"].map((name) => ({
   name,
@@ -95,6 +96,8 @@ function showTotals(totals) {
   const end = totals.responses === 1 ? "resposta registada" : "respostas registadas";
   const text = `${number.format(totals.responses)} ${end}`;
   if (summary.textContent !== text) summary.textContent = text;
+  chart.hidden = false;
+  summary.hidden = false;
   resultsError.hidden = true;
 }
 
@@ -104,6 +107,8 @@ async function fetchTotals() {
   try {
     showTotals(await requestSurvey());
   } catch {
+    chart.hidden = true;
+    summary.hidden = true;
     resultsError.hidden = false;
   } finally {
     refreshing = false;
@@ -120,7 +125,7 @@ async function requestSurvey(submission) {
   const response = await fetch(url, {
     credentials: "omit",
     cache: "no-store",
-    signal: AbortSignal.timeout(20000),
+    signal: AbortSignal.timeout(submission ? 20000 : 8000),
     ...(submission && {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=UTF-8" },
@@ -200,6 +205,7 @@ form.addEventListener("submit", async (event) => {
     await reveal(formPanel, results, document.querySelector("#results-heading"));
     showTotals(payload);
     form.reset();
+    fetchTotals();
     window.setInterval(fetchTotals, refreshInterval);
     document.addEventListener("visibilitychange", fetchTotals);
     window.addEventListener("focus", fetchTotals);
