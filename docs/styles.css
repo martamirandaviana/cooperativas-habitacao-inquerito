@@ -15,6 +15,7 @@
   --wash: #f4f4ef;
   --red: #a53b2e;
   --gutter: clamp(1.25rem, 5.2vw, 5rem);
+  --home-edge: 1.875rem;
   font-family: Manrope, system-ui, sans-serif;
   color: var(--ink);
   background: #fff;
@@ -30,9 +31,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body:has(.intro:not([hidden])) {
+  display: flex;
+  min-block-size: 100svh;
+  flex-direction: column;
+  justify-content: center;
+}
+
 button, input { font: inherit; }
 
-:where(button, input, .question-link, [tabindex]):focus-visible {
+:where(button, input, summary, .question-link, [tabindex]):focus-visible {
   outline: 2px solid var(--red);
   outline-offset: 4px;
 }
@@ -42,21 +50,114 @@ button, input { font: inherit; }
 }
 
 .masthead-inner {
-  display: flex;
-  padding-block-start: 1.875rem;
+  padding-block-start: var(--home-edge);
   margin-inline: auto;
   max-width: 95rem;
+}
+
+.masthead-inner, .intro-caption {
   color: #000;
   font-size: .875rem;
   font-weight: 300;
 }
 
-.masthead-inner p {
+.masthead-toggle {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  cursor: pointer;
+  list-style: none;
+}
+
+.masthead-toggle::-webkit-details-marker { display: none; }
+
+.masthead-label {
   min-inline-size: 0;
-  margin: 0 auto;
-  overflow-x: auto;
-  scrollbar-width: none;
-  white-space: nowrap;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.masthead-indicator {
+  position: relative;
+  flex: none;
+  inline-size: .625rem;
+  block-size: .625rem;
+}
+
+.masthead-indicator::before, .masthead-indicator::after {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
+  border-block-start: 1px solid currentColor;
+  content: "";
+}
+
+.masthead-indicator::after {
+  transform: rotate(90deg);
+  transition: transform .25s ease;
+}
+
+.masthead-inner[open] .masthead-indicator::after { transform: rotate(0); }
+
+.research-context {
+  max-inline-size: 42rem;
+  margin-inline: auto;
+  padding-block-start: 1.5rem;
+  font-size: .9375rem;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.research-context p { margin: 0; }
+.research-context p + p { margin-block-start: .85em; }
+
+@supports (interpolate-size: allow-keywords) and selector(details::details-content) {
+  .masthead-inner::details-content {
+    block-size: 0;
+    overflow: clip;
+    interpolate-size: allow-keywords;
+    transition: block-size .3s ease, content-visibility .3s allow-discrete;
+  }
+
+  .masthead-inner[open]::details-content { block-size: auto; }
+}
+
+@media (any-hover: hover) and (any-pointer: fine) {
+  :root { scrollbar-gutter: stable both-edges; }
+
+  body:has(.intro:not([hidden])) {
+    min-block-size: calc(100svh + var(--research-expansion, 0px));
+  }
+
+  .masthead-inner {
+    inline-size: fit-content;
+    max-inline-size: min(100%, 95rem);
+  }
+
+  .research-context { max-inline-size: 45rem; }
+}
+
+@supports not ((interpolate-size: allow-keywords) and selector(details::details-content)) {
+  .masthead-inner[open] .research-expansion {
+    display: grid;
+    grid-template-rows: 1fr;
+    animation: extend-research .3s ease;
+  }
+
+  .research-context {
+    min-block-size: 0;
+    padding-block-start: 0;
+    overflow: hidden;
+  }
+
+  .research-context p:first-child { margin-block-start: 1.5rem; }
+
+  @keyframes extend-research {
+    from { grid-template-rows: 0fr; }
+  }
 }
 
 .survey {
@@ -65,6 +166,8 @@ button, input { font: inherit; }
   margin: 0 auto;
   padding-block: var(--section-space) 5.5rem;
 }
+
+.survey:has(.intro:not([hidden])) { padding-block-end: var(--home-edge); }
 
 h1, h2 {
   margin: 0;
@@ -128,6 +231,11 @@ h1 {
 }
 
 .intro { margin-top: 2.5rem; text-align: center; }
+
+.intro-caption {
+  margin: var(--section-space) auto 0;
+  text-wrap: balance;
+}
 
 .intro.is-ready {
   animation: show-action .65s .2s both ease-out;
@@ -315,7 +423,7 @@ h2 {
 .summary { margin: 1.5rem 0 0; font-weight: 600; }
 
 @media (max-width: 40rem) {
-  .masthead-inner { padding-block-start: 1.5rem; }
+  :root { --home-edge: 1.5rem; }
   .desktop-break { display: none; }
 
   .survey {

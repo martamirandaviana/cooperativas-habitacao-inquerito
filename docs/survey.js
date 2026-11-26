@@ -1,5 +1,32 @@
 import { surveyEndpoint } from "./survey-config.js";
 
+const researchDisclosure = document.querySelector(".masthead-inner");
+const researchToggle = researchDisclosure.querySelector("summary");
+const mouseHover = matchMedia("(any-hover: hover) and (any-pointer: fine)");
+
+// Balance the expansion outside the centred home layout so the hover target stays in place.
+new ResizeObserver(() => {
+  const expansion = researchDisclosure.getBoundingClientRect().bottom -
+    researchToggle.getBoundingClientRect().bottom;
+  document.body.style.setProperty("--research-expansion", `${expansion}px`);
+}).observe(researchDisclosure);
+
+researchToggle.addEventListener("pointerenter", (event) => {
+  if (mouseHover.matches && event.pointerType === "mouse") researchDisclosure.open = true;
+});
+
+researchDisclosure.addEventListener("pointerleave", (event) => {
+  if (mouseHover.matches && event.pointerType === "mouse") researchDisclosure.open = false;
+});
+
+researchToggle.addEventListener("click", (event) => {
+  if (mouseHover.matches && event.pointerType === "mouse") event.preventDefault();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") researchDisclosure.open = false;
+});
+
 const respond = document.querySelector("#respond");
 const intro = document.querySelector("#intro");
 const formPanel = document.querySelector("#response-panel");
