@@ -41,13 +41,19 @@ function doPost(event) {
     const sheet = responseSheet_();
     const { id, cooperative, email, collective, individual } = submission;
     const rowCount = sheet.getLastRow() - 1;
-    const existing = rowCount > 0 && sheet.getRange(2, 1, rowCount, 1)
-      .createTextFinder(id).matchEntireCell(true).findNext();
-    if (!existing) {
+    const rows = rowCount > 0 ? sheet.getRange(2, 1, rowCount, HEADERS.length).getValues() : [];
+    const totals = { responses: 0, collective: 0, individual: 0 };
+    let alreadyRecorded = false;
+    for (const [storedId, , , , storedCollective, storedIndividual] of rows) {
+      alreadyRecorded ||= storedId === id;
+      countResponse_(totals, storedCollective, storedIndividual);
+    }
+    if (!alreadyRecorded) {
       sheet.appendRow([id, new Date(), literal_(cooperative), literal_(email), collective, individual]);
       SpreadsheetApp.flush();
+      countResponse_(totals, collective, individual);
     }
-    return output_(totals_(sheet));
+    return output_(totals);
   } catch {
     return output_({ error: "O serviço está temporariamente indisponível. Tenta novamente." });
   } finally {
@@ -87,11 +93,15 @@ function totals_(sheet) {
   const result = { responses: 0, collective: 0, individual: 0 };
   if (rows < 1) return result;
   for (const [collective, individual] of sheet.getRange(2, 5, rows, 2).getValues()) {
-    if (collective === true) result.collective++;
-    if (individual === true) result.individual++;
-    if (collective === true || individual === true) result.responses++;
+    countResponse_(result, collective, individual);
   }
   return result;
+}
+
+function countResponse_(result, collective, individual) {
+  if (collective === true) result.collective++;
+  if (individual === true) result.individual++;
+  if (collective === true || individual === true) result.responses++;
 }
 
 function literal_(value) {

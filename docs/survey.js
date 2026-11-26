@@ -138,6 +138,15 @@ async function requestSurvey(submission) {
 
 respond.addEventListener("click", () => {
   respond.disabled = true;
+  if (surveyEndpoint) {
+    for (const origin of [new URL(surveyEndpoint).origin, "https://script.googleusercontent.com"]) {
+      const connection = document.createElement("link");
+      connection.rel = "preconnect";
+      connection.href = origin;
+      connection.crossOrigin = "anonymous";
+      document.head.append(connection);
+    }
+  }
   reveal(intro, formPanel, form.elements.cooperative);
 });
 
