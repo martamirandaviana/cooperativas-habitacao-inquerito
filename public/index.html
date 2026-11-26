@@ -6,7 +6,7 @@
   <meta name="description" content="Inquérito sobre propriedade coletiva e individual nas cooperativas de habitação.">
   <meta name="theme-color" content="#ffffff">
   <title>Cooperativas de Habitação</title>
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="survey.js"></script>
@@ -14,12 +14,12 @@
 <body>
   <header class="masthead">
     <div class="masthead-inner">
-      <p>Inquérito realizado no âmbito da Bolsa de Investigação da FCT sobre Cooperativas de Habitação Acessível</p>
+      <p>Inquérito realizado no âmbito da Bolsa de Investigação de Doutoramento da FCT sobre Cooperativas de Habitação Acessível</p>
     </div>
   </header>
 
   <main class="survey">
-    <h1 aria-label="Quantas cooperativas construíram em propriedade coletiva?">Quantas cooperativas<br class="desktop-break"> construíram em<br class="desktop-break"> <span class="question-mark"><strong>propriedade coletiva</strong><b>?</b></span></h1>
+    <h1 aria-label="Quantas cooperativas construíram em propriedade coletiva?">Quantas cooperativas<br class="desktop-break"> construíram em<br class="desktop-break"> <span class="question-mark"><a class="question-link" href="/" aria-label="Propriedade coletiva, voltar à página inicial"><strong>propriedade coletiva</strong></a><b>?</b></span></h1>
 
     <div id="intro" class="intro">
       <button id="respond" class="button" type="button" aria-controls="response-panel" hidden disabled>Responder</button>
@@ -36,8 +36,7 @@
           </div>
           <div class="field">
             <label for="email">Email de contacto</label>
-            <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required aria-describedby="privacy">
-            <p id="privacy" class="hint">O email é reservado ao contacto e fica privado.</p>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required>
           </div>
           <fieldset class="options">
             <legend>Regime de propriedade</legend>

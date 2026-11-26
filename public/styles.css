@@ -32,7 +32,7 @@ body {
 
 button, input { font: inherit; }
 
-:where(button, input, [tabindex]):focus-visible {
+:where(button, input, .question-link, [tabindex]):focus-visible {
   outline: 2px solid var(--red);
   outline-offset: 4px;
 }
@@ -53,7 +53,7 @@ button, input { font: inherit; }
 
 .masthead-inner p {
   min-inline-size: 0;
-  margin: 0;
+  margin: 0 auto;
   overflow-x: auto;
   scrollbar-width: none;
   white-space: nowrap;
@@ -84,6 +84,8 @@ h1 {
   max-inline-size: 100%;
   padding-block-end: .13em;
 }
+
+.question-link { text-decoration: none; }
 
 .question-mark strong {
   color: var(--red);
