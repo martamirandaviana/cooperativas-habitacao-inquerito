@@ -45,7 +45,7 @@ function doPost(event) {
     const totals = { responses: 0, collective: 0, individual: 0 };
     let alreadyRecorded = false;
     for (const [storedId, , , , storedCollective, storedIndividual] of rows) {
-      alreadyRecorded ||= storedId === id;
+      alreadyRecorded = alreadyRecorded || storedId === id;
       countResponse_(totals, storedCollective, storedIndividual);
     }
     if (!alreadyRecorded) {
