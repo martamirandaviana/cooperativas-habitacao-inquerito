@@ -55,7 +55,7 @@ button, input { font: inherit; }
   max-width: 95rem;
 }
 
-.masthead-inner, .intro-caption {
+.masthead-inner, .intro-caption, .intro-contacts {
   color: #000;
   font-size: .875rem;
   font-weight: 300;
@@ -235,6 +235,19 @@ h1 {
 .intro-caption {
   margin: var(--section-space) auto 0;
   text-wrap: balance;
+}
+
+.intro-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .25rem 1rem;
+  margin: .5rem 0 0;
+}
+
+.intro-contacts a {
+  color: inherit;
+  text-underline-offset: .16em;
 }
 
 .intro.is-ready {
