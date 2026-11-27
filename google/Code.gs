@@ -3,6 +3,7 @@ const SPREADSHEET_PROPERTY = "SURVEY_SPREADSHEET_ID";
 const HEADERS = [
   "ID", "Data do envio", "Nome da cooperativa", "Email de contacto",
   "Propriedade coletiva", "Propriedade individual", "Ano de fundação", "Regime de propriedade pretendido",
+  "Cargo ocupado na cooperativa",
 ];
 const INTENTIONS = new Map([
   ["collective", "Propriedade coletiva"],
@@ -43,7 +44,11 @@ function doGet(event) {
       return output_({ foundingYear: sheet.getRange(1, column).getValue() === "Ano de fundação" });
     }
     if (event?.parameter?.schema === "intended-property") {
-      return output_({ intendedProperty: sheet.getRange(1, HEADERS.length).getValue() === HEADERS[HEADERS.length - 1] });
+      const column = HEADERS.indexOf("Regime de propriedade pretendido") + 1;
+      return output_({ intendedProperty: sheet.getRange(1, column).getValue() === HEADERS[column - 1] });
+    }
+    if (event?.parameter?.schema === "cooperative-role") {
+      return output_({ cooperativeRole: sheet.getRange(1, HEADERS.length).getValue() === HEADERS[HEADERS.length - 1] });
     }
     return output_(totals_(sheet));
   } catch {
@@ -54,16 +59,19 @@ function doGet(event) {
 function doPost(event) {
   const submission = readResponse_(event);
   if (!submission) {
-    return output_({ error: "Reveja o nome, o ano de fundação, o email e as opções selecionadas." });
+    return output_({ error: "Reveja o nome, o ano de fundação, o cargo, o email e as opções selecionadas." });
   }
 
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(8000);
     const sheet = responseSheet_();
-    const { id, cooperative, email, collective, individual, foundingYear, intendedProperty } = submission;
+    const { id, cooperative, email, collective, individual, foundingYear, intendedProperty, cooperativeRole } = submission;
+    if (cooperativeRole && sheet.getRange(1, HEADERS.length).getValue() !== HEADERS[HEADERS.length - 1]) {
+      return output_({ error: "O serviço está temporariamente indisponível. Tenta novamente." });
+    }
     const rowCount = sheet.getLastRow() - 1;
-    const rows = rowCount > 0 ? sheet.getRange(2, 1, rowCount, HEADERS.length).getValues() : [];
+    const rows = rowCount > 0 ? sheet.getRange(2, 1, rowCount, 6).getValues() : [];
     const totals = { responses: 0, collective: 0, individual: 0 };
     let alreadyRecorded = false;
     for (const [storedId, , , , storedCollective, storedIndividual] of rows) {
@@ -73,7 +81,7 @@ function doPost(event) {
     if (!alreadyRecorded) {
       sheet.appendRow([
         id, new Date(), literal_(cooperative), literal_(email), collective, individual,
-        foundingYear ?? "", INTENTIONS.get(intendedProperty) ?? "",
+        foundingYear ?? "", INTENTIONS.get(intendedProperty) ?? "", literal_(cooperativeRole ?? ""),
       ]);
       SpreadsheetApp.flush();
       countResponse_(totals, collective, individual);
@@ -96,7 +104,7 @@ function readResponse_(event) {
     return null;
   }
   if (!data) return null;
-  const { id, cooperative, email, collective, individual, foundingYear, intendedProperty } = data;
+  const { id, cooperative, email, collective, individual, foundingYear, intendedProperty, cooperativeRole } = data;
   const name = typeof cooperative === "string" ? cooperative.trim() : "";
   const contact = typeof email === "string" ? email.trim() : "";
   if (typeof id !== "string" || !UUID.test(id) || !name || name.length > 120 ||
@@ -108,7 +116,9 @@ function readResponse_(event) {
   if (foundingYear != null && (!Number.isInteger(foundingYear) || foundingYear < 1000 || foundingYear > new Date().getFullYear())) {
     return null;
   }
-  return { id: id.toLowerCase(), cooperative: name, email: contact, collective, individual, foundingYear, intendedProperty };
+  const role = typeof cooperativeRole === "string" ? cooperativeRole.trim() : "";
+  if (cooperativeRole !== undefined && (!role || role.length > 120)) return null;
+  return { id: id.toLowerCase(), cooperative: name, email: contact, collective, individual, foundingYear, intendedProperty, cooperativeRole: role };
 }
 
 function responseSheet_() {

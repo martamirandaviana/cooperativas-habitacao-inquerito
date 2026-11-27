@@ -204,6 +204,13 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
+  const cooperativeRole = data.get("cooperativeRole").trim();
+  if (!cooperativeRole) {
+    showFormError("Indique o cargo ocupado na cooperativa.");
+    form.elements.cooperativeRole.focus();
+    return;
+  }
+
   showFormError("");
   fields.disabled = true;
   submitButton.textContent = "A enviar…";
@@ -214,6 +221,7 @@ form.addEventListener("submit", async (event) => {
       id: responseId,
       cooperative,
       foundingYear,
+      cooperativeRole,
       intendedProperty: data.get("intendedProperty"),
       email: data.get("email").trim(),
       collective,

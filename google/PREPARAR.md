@@ -9,6 +9,13 @@
 5. No editor Apps Script, escolhe **Implementar → Nova implementação → Aplicação Web**. Em **Executar como**, escolhe a tua conta. Em **Quem tem acesso**, escolhe **Qualquer pessoa**. Esta definição permite submeter e obter os totais pelo site. A folha de cálculo mantém o acesso **Restrito**.
 6. Carrega em **Implementar** e copia o **URL da aplicação Web**, que começa por `https://script.google.com/macros/s/` e termina em `/exec`. Esse é o endereço a colocar em `docs/survey-config.js`.
 
+## Atualizar a folha existente para guardar o cargo
+
+1. Na folha privada, abre **Extensões → Apps Script**, substitui o conteúdo de **Código.gs** pelo [código atualizado](Code.gs) e guarda.
+2. Executa **configurarInquerito**. A função acrescenta a coluna **Cargo ocupado na cooperativa** ao separador **Respostas** e preserva as respostas anteriores.
+3. Abre **Implementar → Gerir implementações**, seleciona a implementação ativa e clica no lápis. Em **Versão**, escolhe **Nova versão** e clica em **Implementar**. O endereço `/exec` continua a ser o mesmo.
+4. Abre o endereço `/exec` com `?schema=cooperative-role` no fim. Quando aparecer `{"cooperativeRole":true}`, a folha está pronta para receber o novo campo e o formulário atualizado pode ser publicado.
+
 ## Verificar antes de mudar o domínio
 
 - A aplicação Web deve mostrar os três totais ao abrir o URL `/exec` numa janela privada.
