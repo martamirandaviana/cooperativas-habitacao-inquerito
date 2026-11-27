@@ -243,8 +243,7 @@ h1 {
   flex-wrap: wrap;
   justify-content: center;
   gap: .25rem 1rem;
-  margin: .5rem 0 0;
-  color: var(--muted);
+  margin: var(--section-space) 0 0;
 }
 
 .intro-contacts a {
