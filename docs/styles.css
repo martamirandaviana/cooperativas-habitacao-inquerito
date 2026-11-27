@@ -109,10 +109,11 @@ button, input { font: inherit; }
   font-size: .9375rem;
   font-weight: 400;
   line-height: 1.65;
+  text-align: justify;
+  hyphens: auto;
 }
 
 .research-context p { margin: 0; }
-.research-context p + p { margin-block-start: .85em; }
 
 @supports (interpolate-size: allow-keywords) and selector(details::details-content) {
   .masthead-inner::details-content {
@@ -243,6 +244,7 @@ h1 {
   justify-content: center;
   gap: .25rem 1rem;
   margin: .5rem 0 0;
+  color: var(--muted);
 }
 
 .intro-contacts a {
