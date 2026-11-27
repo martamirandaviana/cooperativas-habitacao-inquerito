@@ -184,6 +184,15 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
+  const year = data.get("foundingYear");
+  const foundingYear = year ? Number(year) : null;
+  if (foundingYear !== null &&
+      (!Number.isInteger(foundingYear) || foundingYear < 1000 || foundingYear > new Date().getFullYear())) {
+    showFormError("Indique um ano de fundação válido.");
+    form.elements.foundingYear.focus();
+    return;
+  }
+
   showFormError("");
   fields.disabled = true;
   submitButton.textContent = "A enviar…";
@@ -193,6 +202,7 @@ form.addEventListener("submit", async (event) => {
     const payload = await requestSurvey({
       id: responseId,
       cooperative,
+      foundingYear,
       email: data.get("email").trim(),
       collective,
       individual,

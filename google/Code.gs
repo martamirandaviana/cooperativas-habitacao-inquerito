@@ -2,7 +2,7 @@ const TAB_NAME = "Respostas";
 const SPREADSHEET_PROPERTY = "SURVEY_SPREADSHEET_ID";
 const HEADERS = [
   "ID", "Data do envio", "Nome da cooperativa", "Email de contacto",
-  "Propriedade coletiva", "Propriedade individual",
+  "Propriedade coletiva", "Propriedade individual", "Ano de fundação",
 ];
 const UUID = /^[a-f\d]{8}-[a-f\d]{4}-4[a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+$/u;
@@ -15,15 +15,27 @@ function configurarInquerito() {
     header.setValues([HEADERS]);
     header.setFontWeight("bold");
     sheet.setFrozenRows(1);
-  } else if (header.getValues()[0].some((value, index) => value !== HEADERS[index])) {
-    throw new Error("A folha Respostas já existe e tem um cabeçalho diferente.");
+  } else {
+    const columns = header.getValues()[0];
+    const yearColumn = HEADERS.length - 1;
+    const missingYear = columns[yearColumn] === "";
+    if (columns.some((value, index) => value !== HEADERS[index] && !(index === yearColumn && missingYear))) {
+      throw new Error("A folha Respostas já existe e tem um cabeçalho diferente.");
+    }
+    if (missingYear) {
+      sheet.getRange(1, HEADERS.length).setValue(HEADERS[yearColumn]).setFontWeight("bold");
+    }
   }
   PropertiesService.getScriptProperties().setProperty(SPREADSHEET_PROPERTY, spreadsheet.getId());
 }
 
-function doGet() {
+function doGet(event) {
   try {
-    return output_(totals_(responseSheet_()));
+    const sheet = responseSheet_();
+    if (event?.parameter?.schema === "founding-year") {
+      return output_({ foundingYear: sheet.getRange(1, HEADERS.length).getValue() === HEADERS[HEADERS.length - 1] });
+    }
+    return output_(totals_(sheet));
   } catch {
     return output_({ error: "Os resultados estão temporariamente indisponíveis." });
   }
@@ -32,14 +44,14 @@ function doGet() {
 function doPost(event) {
   const submission = readResponse_(event);
   if (!submission) {
-    return output_({ error: "Revê o nome, o email e as opções selecionadas." });
+    return output_({ error: "Reveja o nome, o ano de fundação, o email e as opções selecionadas." });
   }
 
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(8000);
     const sheet = responseSheet_();
-    const { id, cooperative, email, collective, individual } = submission;
+    const { id, cooperative, email, collective, individual, foundingYear } = submission;
     const rowCount = sheet.getLastRow() - 1;
     const rows = rowCount > 0 ? sheet.getRange(2, 1, rowCount, HEADERS.length).getValues() : [];
     const totals = { responses: 0, collective: 0, individual: 0 };
@@ -49,7 +61,7 @@ function doPost(event) {
       countResponse_(totals, storedCollective, storedIndividual);
     }
     if (!alreadyRecorded) {
-      sheet.appendRow([id, new Date(), literal_(cooperative), literal_(email), collective, individual]);
+      sheet.appendRow([id, new Date(), literal_(cooperative), literal_(email), collective, individual, foundingYear ?? ""]);
       SpreadsheetApp.flush();
       countResponse_(totals, collective, individual);
     }
@@ -71,7 +83,7 @@ function readResponse_(event) {
     return null;
   }
   if (!data) return null;
-  const { id, cooperative, email, collective, individual } = data;
+  const { id, cooperative, email, collective, individual, foundingYear } = data;
   const name = typeof cooperative === "string" ? cooperative.trim() : "";
   const contact = typeof email === "string" ? email.trim() : "";
   if (typeof id !== "string" || !UUID.test(id) || !name || name.length > 120 ||
@@ -79,7 +91,10 @@ function readResponse_(event) {
       typeof collective !== "boolean" || typeof individual !== "boolean" || !(collective || individual)) {
     return null;
   }
-  return { id: id.toLowerCase(), cooperative: name, email: contact, collective, individual };
+  if (foundingYear != null && (!Number.isInteger(foundingYear) || foundingYear < 1000 || foundingYear > new Date().getFullYear())) {
+    return null;
+  }
+  return { id: id.toLowerCase(), cooperative: name, email: contact, collective, individual, foundingYear };
 }
 
 function responseSheet_() {
