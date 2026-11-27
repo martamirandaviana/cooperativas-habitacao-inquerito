@@ -52,7 +52,7 @@
             <input id="cooperative" name="cooperative" autocomplete="organization" maxlength="120" required>
           </div>
           <div class="field">
-            <label for="founding-year">Ano de fundação <span class="field-optional">(opcional)</span></label>
+            <label for="founding-year">Ano de fundação <span class="field-note">(opcional)</span></label>
             <input id="founding-year" name="foundingYear" inputmode="numeric" pattern="[0-9]{4}" maxlength="4">
           </div>
           <div class="field">
@@ -60,7 +60,10 @@
             <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required>
           </div>
           <fieldset class="options">
-            <legend>Regime de propriedade</legend>
+            <legend>
+              Regime de propriedade<br>
+              <span class="field-note">(Selecione a opção que melhor corresponde à sua situação)</span>
+            </legend>
             <label class="option">
               <input type="radio" name="property" value="collective" required>
               <span>Construímos ou estamos a construir em <strong>propriedade coletiva</strong></span>
@@ -72,6 +75,27 @@
             <label class="option">
               <input type="radio" name="property" value="both">
               <span>Construímos ou estamos a construir em <strong>propriedade coletiva e individual</strong></span>
+            </label>
+            <label class="option">
+              <input type="radio" name="property" value="planned" aria-controls="planned-regime">
+              <span>Ainda não construímos nem estamos a construir</span>
+            </label>
+          </fieldset>
+          <fieldset class="options" id="planned-regime" hidden disabled>
+            <legend>
+              Em que regime de propriedade pretendem construir?
+            </legend>
+            <label class="option">
+              <input type="radio" name="intendedProperty" value="collective" required>
+              <span>Pretendemos construir em <strong>propriedade coletiva</strong></span>
+            </label>
+            <label class="option">
+              <input type="radio" name="intendedProperty" value="individual">
+              <span>Pretendemos construir em <strong>propriedade individual</strong></span>
+            </label>
+            <label class="option">
+              <input type="radio" name="intendedProperty" value="both">
+              <span>Pretendemos construir em <strong>propriedade coletiva e individual</strong></span>
             </label>
           </fieldset>
           <button id="submit-response" class="button" type="submit">Enviar resposta</button>

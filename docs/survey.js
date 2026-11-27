@@ -158,6 +158,15 @@ respond.addEventListener("click", () => {
   reveal(intro, formPanel, form.elements.cooperative);
 });
 
+const plannedRegime = document.querySelector("#planned-regime");
+form.addEventListener("change", (event) => {
+  if (event.target.name === "property") {
+    const show = event.target.value === "planned";
+    plannedRegime.hidden = !show;
+    plannedRegime.disabled = !show;
+  }
+});
+
 form.addEventListener("input", () => {
   responseId = undefined;
   showFormError("");
@@ -171,7 +180,7 @@ form.addEventListener("submit", async (event) => {
   const property = data.get("property");
   const collective = property === "collective" || property === "both";
   const individual = property === "individual" || property === "both";
-  if (!collective && !individual) {
+  if (!collective && !individual && property !== "planned") {
     showFormError("Seleciona uma opção.");
     form.elements.property[0].focus();
     return;
@@ -203,6 +212,7 @@ form.addEventListener("submit", async (event) => {
       id: responseId,
       cooperative,
       foundingYear,
+      intendedProperty: data.get("intendedProperty"),
       email: data.get("email").trim(),
       collective,
       individual,

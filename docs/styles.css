@@ -317,7 +317,7 @@ h2 {
 .field { margin-bottom: 1.45rem; }
 .options { margin: 1.5rem 0 1.75rem; }
 .field label, .options legend { display: block; font-weight: 650; padding: 0; }
-.field-optional { font-weight: 300; }
+.field-note { font-weight: 300; }
 
 .field input {
   width: 100%;

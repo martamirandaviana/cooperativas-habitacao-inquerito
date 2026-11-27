@@ -2,8 +2,13 @@ const TAB_NAME = "Respostas";
 const SPREADSHEET_PROPERTY = "SURVEY_SPREADSHEET_ID";
 const HEADERS = [
   "ID", "Data do envio", "Nome da cooperativa", "Email de contacto",
-  "Propriedade coletiva", "Propriedade individual", "Ano de fundação",
+  "Propriedade coletiva", "Propriedade individual", "Ano de fundação", "Regime de propriedade pretendido",
 ];
+const INTENTIONS = new Map([
+  ["collective", "Propriedade coletiva"],
+  ["individual", "Propriedade individual"],
+  ["both", "Propriedade coletiva e individual"],
+]);
 const UUID = /^[a-f\d]{8}-[a-f\d]{4}-4[a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+$/u;
 
@@ -17,13 +22,14 @@ function configurarInquerito() {
     sheet.setFrozenRows(1);
   } else {
     const columns = header.getValues()[0];
-    const yearColumn = HEADERS.length - 1;
-    const missingYear = columns[yearColumn] === "";
-    if (columns.some((value, index) => value !== HEADERS[index] && !(index === yearColumn && missingYear))) {
+    const firstAddedColumn = HEADERS.indexOf("Ano de fundação");
+    if (columns.some((value, index) => value !== HEADERS[index] && !(index >= firstAddedColumn && value === ""))) {
       throw new Error("A folha Respostas já existe e tem um cabeçalho diferente.");
     }
-    if (missingYear) {
-      sheet.getRange(1, HEADERS.length).setValue(HEADERS[yearColumn]).setFontWeight("bold");
+    for (let index = firstAddedColumn; index < HEADERS.length; index++) {
+      if (columns[index] === "") {
+        sheet.getRange(1, index + 1).setValue(HEADERS[index]).setFontWeight("bold");
+      }
     }
   }
   PropertiesService.getScriptProperties().setProperty(SPREADSHEET_PROPERTY, spreadsheet.getId());
@@ -33,7 +39,11 @@ function doGet(event) {
   try {
     const sheet = responseSheet_();
     if (event?.parameter?.schema === "founding-year") {
-      return output_({ foundingYear: sheet.getRange(1, HEADERS.length).getValue() === HEADERS[HEADERS.length - 1] });
+      const column = HEADERS.indexOf("Ano de fundação") + 1;
+      return output_({ foundingYear: sheet.getRange(1, column).getValue() === "Ano de fundação" });
+    }
+    if (event?.parameter?.schema === "intended-property") {
+      return output_({ intendedProperty: sheet.getRange(1, HEADERS.length).getValue() === HEADERS[HEADERS.length - 1] });
     }
     return output_(totals_(sheet));
   } catch {
@@ -51,7 +61,7 @@ function doPost(event) {
   try {
     lock.waitLock(8000);
     const sheet = responseSheet_();
-    const { id, cooperative, email, collective, individual, foundingYear } = submission;
+    const { id, cooperative, email, collective, individual, foundingYear, intendedProperty } = submission;
     const rowCount = sheet.getLastRow() - 1;
     const rows = rowCount > 0 ? sheet.getRange(2, 1, rowCount, HEADERS.length).getValues() : [];
     const totals = { responses: 0, collective: 0, individual: 0 };
@@ -61,7 +71,10 @@ function doPost(event) {
       countResponse_(totals, storedCollective, storedIndividual);
     }
     if (!alreadyRecorded) {
-      sheet.appendRow([id, new Date(), literal_(cooperative), literal_(email), collective, individual, foundingYear ?? ""]);
+      sheet.appendRow([
+        id, new Date(), literal_(cooperative), literal_(email), collective, individual,
+        foundingYear ?? "", INTENTIONS.get(intendedProperty) ?? "",
+      ]);
       SpreadsheetApp.flush();
       countResponse_(totals, collective, individual);
     }
@@ -83,18 +96,19 @@ function readResponse_(event) {
     return null;
   }
   if (!data) return null;
-  const { id, cooperative, email, collective, individual, foundingYear } = data;
+  const { id, cooperative, email, collective, individual, foundingYear, intendedProperty } = data;
   const name = typeof cooperative === "string" ? cooperative.trim() : "";
   const contact = typeof email === "string" ? email.trim() : "";
   if (typeof id !== "string" || !UUID.test(id) || !name || name.length > 120 ||
       contact.length > 254 || !EMAIL.test(contact) ||
-      typeof collective !== "boolean" || typeof individual !== "boolean" || !(collective || individual)) {
+      typeof collective !== "boolean" || typeof individual !== "boolean") {
     return null;
   }
+  if (collective || individual ? intendedProperty != null : !INTENTIONS.has(intendedProperty)) return null;
   if (foundingYear != null && (!Number.isInteger(foundingYear) || foundingYear < 1000 || foundingYear > new Date().getFullYear())) {
     return null;
   }
-  return { id: id.toLowerCase(), cooperative: name, email: contact, collective, individual, foundingYear };
+  return { id: id.toLowerCase(), cooperative: name, email: contact, collective, individual, foundingYear, intendedProperty };
 }
 
 function responseSheet_() {
