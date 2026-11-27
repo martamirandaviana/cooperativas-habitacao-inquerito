@@ -38,6 +38,8 @@ const results = document.querySelector("#results-panel");
 const resultsError = document.querySelector("#results-error");
 const chart = results.querySelector(".chart");
 const summary = document.querySelector("#results-summary");
+const resultsHeading = document.querySelector("#results-heading");
+const confirmation = document.querySelector("#response-confirmation");
 const groups = ["collective", "individual"].map((name) => ({
   name,
   count: document.querySelector(`#${name}-count`),
@@ -222,9 +224,19 @@ form.addEventListener("submit", async (event) => {
       return;
     }
 
-    await reveal(formPanel, results, document.querySelector("#results-heading"));
-    showTotals(payload);
+    const planned = property === "planned";
+    if (planned) {
+      resultsHeading.hidden = true;
+      chart.hidden = true;
+      summary.hidden = true;
+      results.setAttribute("aria-labelledby", confirmation.id);
+    }
+
+    await reveal(formPanel, results, planned ? confirmation : resultsHeading);
     form.reset();
+    if (planned) return;
+
+    showTotals(payload);
     fetchTotals();
     window.setInterval(fetchTotals, refreshInterval);
     document.addEventListener("visibilitychange", fetchTotals);
