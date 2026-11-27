@@ -374,7 +374,7 @@ h2 {
   font-size: .9375rem;
 }
 
-.results-status { margin: -.6rem 0 1.5rem; color: var(--muted); }
+.results-status { margin: -.6rem 0 1.5rem; color: var(--muted); text-align: center; }
 #results-heading[hidden] + .results-status { margin: 0; }
 .chart {
   --plot-height: clamp(9rem, 25vh, 13rem);
